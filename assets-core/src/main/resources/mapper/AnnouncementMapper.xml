@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sihsing.assets.storage.mysql.mapper.AnnouncementMapper">
+    <resultMap id="BaseResultMap" type="com.sihsing.assets.model.po.AnnouncementPO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="type" jdbcType="VARCHAR" property="type" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="announce_time" jdbcType="TIMESTAMP" property="announceTime" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+    </resultMap>
+
+    <resultMap id="VoResultMap" type="com.sihsing.assets.model.vo.AnnouncementVO">
+        <result column="announce_id" jdbcType="INTEGER" property="announceId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="announce_status" jdbcType="VARCHAR" property="announceStatus" />
+        <result column="type" jdbcType="VARCHAR" property="type" />
+        <result column="announce_create_time" jdbcType="TIMESTAMP" property="announceCreateTime" />
+        <result column="announce_open_time" jdbcType="TIMESTAMP" property="announceOpenTime" />
+        <result column="user_id" jdbcType="INTEGER" property="userId" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, title, content, status, `type`, create_time, announce_time, user_id
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List" />
+        from announcement
+        where id = #{id}
+    </select>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.sihsing.assets.model.po.AnnouncementPO" useGeneratedKeys="true">
+        insert into announcement (title, content, status,
+          type, create_time, announce_time, user_id)
+        values (
+            #{title,jdbcType=VARCHAR},
+            #{content,jdbcType=VARCHAR},
+            #{status,jdbcType=VARCHAR},
+            #{type,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{announceTime,jdbcType=TIMESTAMP},
+            #{userId,jdbcType=INTEGER})
+    </insert>
+
+    <update id="update" parameterType="com.sihsing.assets.model.po.AnnouncementPO" >
+        update announcement
+        <set>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="announceTime != null">announce_time = #{announceTime},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from announcement
+        where id = #{id}
+    </delete>
+
+    <select id="selectByTopTenAndAnnounceTime" resultMap="VoResultMap">
+        select
+        a.id as announce_id, title, content, `type`, e.id as user_id, a.announce_time as announce_open_time, e.name as user_name
+        from announcement a
+        join employee e on a.user_id = e.id
+        where
+        <![CDATA[
+        a.announce_time <= #{announceTime}
+        ]]>
+        and a.status = "OPEN"
+        order by announce_time desc
+        limit 10
+    </select>
+
+    <select id="selectAll" resultMap="VoResultMap">
+        select
+        a.id as announce_id, title, content, `type`, e.id as user_id, a.announce_time as announce_open_time, e.name as user_name
+        from announcement a
+        join employee e on a.user_id = e.id
+        order by isnull(announce_time) desc, announce_time desc
+    </select>
+
+</mapper>

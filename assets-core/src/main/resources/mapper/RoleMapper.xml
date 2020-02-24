@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sihsing.assets.storage.mysql.mapper.RoleMapper">
+    <resultMap id="BaseResultMap" type="com.sihsing.assets.model.po.RolePO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, `name`, description, status
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List" />
+        from role
+        where id = #{id}
+    </select>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.sihsing.assets.model.po.RolePO" useGeneratedKeys="true">
+        insert into role (`name`, description, status)
+        values (
+            #{name,jdbcType=VARCHAR},
+            #{description,jdbcType=VARCHAR},
+            #{status,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="update" parameterType="com.sihsing.assets.model.po.RolePO" >
+        update role
+        <set>
+            <if test="name != null and name != ''">`name` = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from role
+        where id = #{id}
+    </delete>
+
+</mapper>

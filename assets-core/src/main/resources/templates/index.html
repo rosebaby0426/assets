@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorator="layout"
+      xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+  <head layout:fragment="contentHead">
+    <title>首页</title>
+  </head>
+  <body>
+    <div layout:fragment="content">
+
+      <!-- /.row -->
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              最新公告
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                  <tr>
+                    <th>公告類型</th>
+                    <th>公告時間</th>
+                    <th>標題</th>
+                    <th>發布者</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr th:if="${#lists.isEmpty(announcements)}" class="indexData">
+                    <td colspan="11">沒有數據</td>
+                  </tr>
+                  <tr th:unless="${#lists.isEmpty(announcements)}" class="indexData" th:each="announce,iter : ${announcements}"
+                      onclick="openAnnouncementDetail(this)" th:data-announcementIndex = "${iter.index}">
+                    <td class="col-lg-2" th:text="${announce.type}"></td>
+                    <td class="col-lg-2" th:text="${announce.announceOpenTime}"></td>
+                    <td class="col-lg-6" th:text="${announce.title}"></td>
+                    <td class="col-lg-2" th:text="${announce.userName}"></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive -->
+            </div>
+            <!-- /.panel-body -->
+          </div>
+          <!-- /.panel -->
+        </div>
+      </div>
+
+      <!-- Modal detail -->
+      <div class="modal fade" id="announcementDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+           aria-hidden="true">
+        <div class="modal-dialog" style="width: 900px">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">公告內容</h4>
+            </div>
+            <div class="modal-body" id="detailModalContent">
+              <!-- /.col-lg-6 -->
+              <div class="">
+                <div class="panel panel-default">
+                  <div class="panel-heading" id="announcementTitle">
+
+                  </div>
+                  <!-- /.panel-heading -->
+                  <div class="panel-body">
+                    <div class="table-responsive">
+                      <table class="table">
+                        <thead>
+                        <tr>
+                          <th>發布者</th>
+                          <th id="userName"></th>
+                          <th>發布時間</th>
+                          <th id="announceOpenTime"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                          <td colspan="4" id="announceContent">1</td>
+                        </tr>
+
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- /.table-responsive -->
+                  </div>
+                  <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+              </div>
+              <!-- /.col-lg-6 -->
+
+            </div>
+            <div class="modal-footer">
+              <div class="btn btn-default" data-dismiss="modal">確認</div>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- /.modal -->
+
+	</div>
+  </body>
+  <div layout:fragment="contentJs">
+    <script type="text/javascript" th:inline="javascript">
+      console.log([[${announcements}]]);
+
+      function openAnnouncementDetail(element) {
+        let index = $(element).attr("data-announcementIndex");
+        let announceList = [[${announcements}]];
+        let announce = announceList[index];
+
+        $("#announcementTitle").text("標題：" + announce.title);
+        $("#userName").text(announce.userName);
+        $("#announceOpenTime").text(announce.announceOpenTime);
+        $("#announceContent").text(announce.content);
+        $("#announcementDetailModal").modal("show");
+      }
+    </script>
+  </div>
+  
+
+</html>

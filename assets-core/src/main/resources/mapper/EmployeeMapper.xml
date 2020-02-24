@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sihsing.assets.storage.mysql.mapper.EmployeeMapper">
+    <resultMap id="BaseResultMap" type="com.sihsing.assets.model.po.EmployeePO">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="emp_id" jdbcType="VARCHAR" property="empId" />
+        <result column="account" jdbcType="VARCHAR" property="account" />
+        <result column="password" jdbcType="VARCHAR" property="password" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="english_name" jdbcType="VARCHAR" property="englishName" />
+        <result column="phone" jdbcType="VARCHAR" property="phone" />
+        <result column="address" jdbcType="VARCHAR" property="address" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime" />
+        <result column="login_failure_times" jdbcType="INTEGER" property="loginFailureTimes" />
+        <result column="department_id" jdbcType="INTEGER" property="departmentId" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+    </resultMap>
+
+    <resultMap id="VoResultMap" type="com.sihsing.assets.model.vo.EmployeeVO">
+        <result column="emp_id" jdbcType="VARCHAR" property="empId" />
+        <result column="account" jdbcType="VARCHAR" property="account" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="english_name" jdbcType="VARCHAR" property="englishName" />
+        <result column="phone" jdbcType="VARCHAR" property="phone" />
+        <result column="address" jdbcType="VARCHAR" property="address" />
+        <result column="department_id" jdbcType="INTEGER" property="departmentId" />
+        <result column="department_name" jdbcType="VARCHAR" property="departmentName"/>
+        <result column="status" jdbcType="VARCHAR" property="status" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,emp_id,account,password,`name`, english_name,phone,address,create_time,
+        update_time,last_login_time,login_failure_times,department_id,status
+    </sql>
+
+
+    <select id="login" resultMap="BaseResultMap" parameterType="com.sihsing.assets.model.po.EmployeePO">
+        select
+        id, account, name, english_name, create_time, last_login_time
+        from employee
+        where account = #{account} and password = #{password}
+    </select>
+
+    <update id="update" parameterType="com.sihsing.assets.model.po.EmployeePO" >
+        update employee
+        <set>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="englishName != null">english_name = #{englishName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where account = #{account}
+    </update>
+
+    <update id="updateAccount">
+        update employee
+        <set>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="account != null and account != ''">account = #{account},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where emp_id = #{empId}
+    </update>
+
+    <update id="updateLogin" parameterType="com.sihsing.assets.model.po.EmployeePO">
+        update employee
+        set
+        last_login_time = #{lastLoginTime}
+        where account = #{account}
+    </update>
+
+    <select id="getEmpInfo" resultMap="VoResultMap">
+        select
+        emp_id, account, e.name, english_name, phone, address, department_id, d.name as department_name , status
+        from employee e
+        left join department d on e.department_id = d.id
+        where account = #{account}
+    </select>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.sihsing.assets.model.po.EmployeePO" useGeneratedKeys="true">
+        insert into employee (emp_id, account, password,
+          name, english_name, phone, address, create_time, status, department_id)
+        values (
+            #{empId,jdbcType=VARCHAR},
+            #{account,jdbcType=VARCHAR},
+            #{password,jdbcType=VARCHAR},
+            #{name,jdbcType=VARCHAR},
+            #{englishName,jdbcType=VARCHAR},
+            #{phone,jdbcType=VARCHAR},
+            #{address,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{status,jdbcType=VARCHAR},
+            #{departmentId,jdbcType=INTEGER})
+    </insert>
+
+    <select id="selectInfoByEmpId" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from employee
+        where emp_id = #{empId}
+    </select>
+
+    <select id="selectInfoByAccount" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from employee
+        where account = #{account}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from employee
+    </select>
+
+    <select id="selectByCondition" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from employee
+        <where>
+            <if test="empId != null">and emp_id = #{empId}</if>
+            <if test="account != null">and account = #{account}</if>
+            <if test="name != null">and `name` = #{name}</if>
+        </where>
+    </select>
+
+</mapper>
